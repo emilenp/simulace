@@ -12,13 +12,30 @@ namespace simulace
 
         class Simulation
         {
-            private PriorityQueue<int, Car> EventQueue { get; set; }
+            private PriorityQueue<Event> EventQueue { get; set; }
             private Queue<Car> Arsenal { get; set; }
+            private int Time { get; set; }
             public void Start()
             {
-                EventQueue = new PriorityQueue<int, Car>();
+                EventQueue = new PriorityQueue<Event>();
                 Arsenal = new Queue<Car>();
+                Time = 0;
+
                 GetInput();
+                MainLoop();
+            }
+
+            private void MainLoop()
+            {
+                while (true)
+                {
+                    ProcessEvent(EventQueue.Dequeue());
+                }
+            }
+
+            private void ProcessEvent(Event e)
+            {
+
             }
 
             private void GetInput()
@@ -43,7 +60,7 @@ namespace simulace
         }
 
         enum Status { START, FINISH}
-        enum EventType { LOADING, UNLOADING, TRAVELING }
+        enum EventType { LOAD, UNLOAD, TRAVEL, TRAVELBACK}
 
         class Car
         {
@@ -61,16 +78,22 @@ namespace simulace
 
         }
 
-        class Event
+        class Event : IComparable<Event>
         {
+            public int Time { get; private set; }
             public Car car { get; private set; }
             public Status status { get; private set; }
             public EventType eventType { get; private set; }
+
             public Event(Car car, Status status, EventType eventType)
             {
                 this.car = car; this.status = status; this.eventType = eventType;
             }
 
+            public int CompareTo(Event secondEvent)
+            {
+                return Math.Sign(this.Time - secondEvent.Time);
+            }
         }
     }
 }
