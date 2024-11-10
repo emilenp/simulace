@@ -1,5 +1,3 @@
-using System;
-
 namespace simulace
 {
     internal class Program
@@ -12,12 +10,12 @@ namespace simulace
 
         class Simulation
         {
-            private PriorityQueue<Event> EventQueue { get; set; }
+            private PriorityQueue<Event, Event> EventQueue { get; set; }
             private Queue<Car> Arsenal { get; set; }
             private int Time { get; set; }
             public void Start()
             {
-                EventQueue = new PriorityQueue<Event>();
+                EventQueue = new PriorityQueue<Event, Event>(new CustomEventcComparer());
                 Arsenal = new Queue<Car>();
                 Time = 0;
 
@@ -78,7 +76,7 @@ namespace simulace
 
         }
 
-        class Event : IComparable<Event>
+        class Event
         {
             public int Time { get; private set; }
             public Car car { get; private set; }
@@ -89,10 +87,24 @@ namespace simulace
             {
                 this.car = car; this.status = status; this.eventType = eventType;
             }
+        }
 
-            public int CompareTo(Event secondEvent)
+        class CustomEventComparer : IComparer<Event>
+        {
+            public int Compare(Event a, Event b)
             {
-                return Math.Sign(this.Time - secondEvent.Time);
+                if (a.Time == b.Time)
+                {
+                    return 0;
+                }
+                else if (a.Time > b.Time)
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 1;
+                }
             }
         }
     }
